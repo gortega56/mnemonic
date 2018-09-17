@@ -12,4 +12,6 @@
 
 MNEMONIC_API void* mnemonic_malloc(const uint size);
 
+MNEMONIC_API int mnemonic_free(void* ptr);
+
 #endif

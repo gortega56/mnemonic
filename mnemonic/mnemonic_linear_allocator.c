@@ -10,13 +10,13 @@ typedef struct linear_heap
 {
     struct linear_heap* m_prev;
     byte* m_begin;
-    uint m_size;
+    size_t m_size;
 } linear_heap;
 
 typedef struct linear_allocator
 {
     linear_heap* m_current;
-    uint m_offset;
+    size_t m_offset;
     byte m_flags;
 } linear_allocator;
 
@@ -99,7 +99,7 @@ void* mnemonic_linear_alloc(linear_allocator* allocator, uint size, uint align, 
     ptr.as_void = current;
     ptr.as_byte = (byte*)mnemonic_align_up(ptr.as_byte + offset, align) - offset;
 
-    uint alignment = (ptr.as_byte - current);
+    uint alignment = (uint)(ptr.as_byte - current);
     allocator->m_offset += size + alignment + offset;
 
     if (ptr.as_byte > allocator->m_current->m_begin + allocator->m_current->m_size)
@@ -220,7 +220,7 @@ pool_allocator* mnemonic_pool_init(void* begin, uint size, uint stride, uint ali
     alloc->m_head = ptr.as_pool_node;
 
     byte* end = ptr.as_byte + alloc->m_current->m_size;
-    uintptr_t diff = (uintptr_t)(end - ptr.as_byte);
+    uint diff = (uint)(end - ptr.as_byte);
     uint count =  diff / stride;
     
     ptr.as_byte += stride;
@@ -255,9 +255,8 @@ void* mnemonic_pool_alloc(pool_allocator* allocator)
             byte* begin = (byte*)heap + sizeof(pool_heap);
             byte* end = begin + heap->m_size;
 
-            uintptr_t stride = allocator->m_stride;
-            uintptr_t diff = (uintptr_t)(end - begin);
-            uint count =  diff / stride;
+            uint diff = (uint)(end - begin);
+            uint count =  diff / allocator->m_stride;
 
             allocator->m_head = (pool_node*)begin;
 
@@ -268,6 +267,7 @@ void* mnemonic_pool_alloc(pool_allocator* allocator)
                 pool_node* as_pool_node;
             } ptr;
 
+            uintptr_t stride = (uintptr_t)allocator->m_stride;
             ptr.as_void = allocator->m_head;
             ptr.as_byte = ptr.as_byte + stride;
 

@@ -33,3 +33,8 @@ void* mnemonic_malloc(const uint size)
 {
     return mnemonic_platform_malloc(size);
 }
+
+int mnemonic_free(void* ptr)
+{
+    return mnemonic_platform_free(ptr);
+}
